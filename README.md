@@ -1,16 +1,18 @@
 # Azure Infrastructure Patterns
 
-Enterprise-grade Azure infrastructure templates with DevOps best practices.
+Enterprise-grade Azure infrastructure templates with DevOps best practices
 
 ## Quick Start
 
 ### 1. Clone this repository at work
+
 ```bash
 git clone https://github.com/YOUR_USERNAME/azure-infrastructure-patterns.git
 cd azure-infrastructure-patterns
 ```
 
 ### 2. Discover your current Azure setup (SAFE - read-only)
+
 ```bash
 az login
 az account set --subscription "YOUR_SUBSCRIPTION_ID"
@@ -18,15 +20,18 @@ az account set --subscription "YOUR_SUBSCRIPTION_ID"
 ```
 
 ### 3. Use GitHub Copilot to analyze existing infrastructure
+
 Open VS Code with both your existing Terraform files AND this repository:
 
 **Key Prompts:**
+
 - "Analyze my existing Azure infrastructure and explain the architecture"
 - "How can I implement blue-green deployments with my current VMSS setup?"
 - "Help me customize terraform.tfvars with my actual values"
 - "Create a migration plan from current to modern patterns"
 
 ### 4. Customize templates
+
 ```bash
 # Find all customization points
 grep -r "TODO:" . --exclude-dir=.git
@@ -48,6 +53,7 @@ cp terraform/environments/dev/terraform.tfvars.example terraform/environments/de
 ## Architecture
 
 This implements:
+
 - Immutable Infrastructure with Packer
 - Blue-Green Deployments for zero downtime
 - Defense in Depth security
