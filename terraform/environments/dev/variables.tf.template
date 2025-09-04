@@ -1,0 +1,70 @@
+variable "company_name" {
+  description = "Company name for resource naming"
+  type        = string
+  
+  validation {
+    condition = can(regex("^[a-z0-9]{2,10}$", var.company_name))
+    error_message = "Company name must be 2-10 characters, lowercase alphanumeric only."
+  }
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "dev"
+}
+
+variable "location" {
+  description = "Azure region"
+  type        = string
+}
+
+variable "vnet_address_space" {
+  description = "Address space for the virtual network"
+  type        = list(string)
+}
+
+variable "subnet_cidrs" {
+  description = "CIDR blocks for subnets"
+  type = object({
+    web  = list(string)
+    app  = list(string)
+    data = list(string)
+  })
+}
+
+variable "vm_size" {
+  description = "Size of VMs in VMSS"
+  type        = string
+  default     = "Standard_D2s_v3"
+}
+
+variable "min_capacity" {
+  description = "Minimum VMSS capacity"
+  type        = number
+  default     = 2
+}
+
+variable "max_capacity" {
+  description = "Maximum VMSS capacity"
+  type        = number
+  default     = 10
+}
+
+variable "postgres_version" {
+  description = "PostgreSQL version"
+  type        = string
+  default     = "13"
+}
+
+variable "postgres_sku" {
+  description = "PostgreSQL SKU"
+  type        = string
+  default     = "GP_Standard_D2s_v3"
+}
+
+variable "common_tags" {
+  description = "Common tags for all resources"
+  type        = map(string)
+  default     = {}
+}

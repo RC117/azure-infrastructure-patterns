@@ -1,0 +1,9 @@
+terraform {
+  backend "azurerm" {
+    # TODO: Replace with your company's storage account details
+    resource_group_name  = "COMPANY_NAME-terraform-state-rg"
+    storage_account_name = "COMPANY_NAMEtfstate"
+    container_name       = "tfstate"
+    key                  = "ENVIRONMENT/terraform.tfstate"
+  }
+}

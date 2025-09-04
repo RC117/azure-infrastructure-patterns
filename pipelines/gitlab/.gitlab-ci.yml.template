@@ -1,0 +1,84 @@
+variables:
+  COMPANY_NAME: "COMPANY_NAME"
+  TF_ROOT: "terraform"
+  TF_VERSION: "1.6.6"
+  PACKER_VERSION: "1.9.4"
+
+stages:
+  - validate
+  - security
+  - plan
+  - deploy
+  - test
+
+.terraform_base: &terraform_base
+  image: hashicorp/terraform:${TF_VERSION}
+  before_script:
+    - cd ${TF_ROOT}
+    - export ARM_CLIENT_ID="${AZURE_CLIENT_ID}"
+    - export ARM_CLIENT_SECRET="${AZURE_CLIENT_SECRET}"
+    - export ARM_SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID}"
+    - export ARM_TENANT_ID="${AZURE_TENANT_ID}"
+
+terraform-validate:
+  <<: *terraform_base
+  stage: validate
+  script:
+    - terraform fmt -check -recursive
+    - cd environments/dev && terraform init -backend=false && terraform validate
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+security-scan:
+  image: bridgecrew/checkov:latest
+  stage: security
+  script:
+    - checkov -d terraform/ --framework terraform
+  allow_failure: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+plan-dev:
+  <<: *terraform_base
+  stage: plan
+  script:
+    - cd environments/dev
+    - terraform init
+    - terraform plan -var-file="terraform.tfvars" -out=tfplan
+  artifacts:
+    paths:
+      - ${TF_ROOT}/environments/dev/tfplan
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+deploy-dev:
+  <<: *terraform_base
+  stage: deploy
+  script:
+    - cd environments/dev
+    - terraform init
+    - terraform apply -auto-approve tfplan
+  environment:
+    name: dev
+    url: https://dev.${COMPANY_NAME}.com
+  dependencies:
+    - plan-dev
+  when: manual
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+test-deployment:
+  stage: test
+  image: mcr.microsoft.com/azure-cli:latest
+  script:
+    - echo "Running deployment validation tests..."
+    - az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID}
+    - az account set --subscription ${AZURE_SUBSCRIPTION_ID}
+    # TODO: Add specific validation tests
+  dependencies:
+    - deploy-dev
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'

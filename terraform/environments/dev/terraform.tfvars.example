@@ -1,0 +1,32 @@
+# TODO: Replace with your actual values
+
+company_name = "COMPANY_NAME"
+environment  = "dev"
+location     = "East US"
+
+# Network Configuration
+# TODO: Update with your actual network ranges
+vnet_address_space = ["10.0.0.0/16"]
+subnet_cidrs = {
+  web  = ["10.0.1.0/24"]
+  app  = ["10.0.2.0/24"]
+  data = ["10.0.3.0/24"]
+}
+
+# VMSS Configuration
+vm_size      = "Standard_D2s_v3"
+min_capacity = 2
+max_capacity = 10
+
+# Database Configuration
+postgres_version = "13"
+postgres_sku     = "GP_Standard_D2s_v3"
+
+# Tags
+common_tags = {
+  Environment   = "dev"
+  CreatedBy     = "terraform"
+  CostCenter    = "COST_CENTER"
+  Project       = "infrastructure-modernization"
+  Owner         = "devops-team"
+}

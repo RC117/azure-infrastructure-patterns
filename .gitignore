@@ -1,0 +1,47 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform/
+.terraform.lock.hcl
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Packer
+packer_cache/
+*.box
+manifest.json
+
+# IDE and OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs and secrets
+*.log
+logs/
+*.pem
+*.key
+.env
+.env.local
+secrets/
+private/
+
+# Cache and builds
+node_modules/
+.cache/
+*.tmp
+dist/
+build/
+target/
+
+# Discovery output (generated at work)
+discovery-output/
+current-config-reference.json
