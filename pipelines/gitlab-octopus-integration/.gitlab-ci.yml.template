@@ -1,0 +1,93 @@
+# GitLab CI/CD with Octopus Deploy Integration
+variables:
+  OCTOPUS_SERVER: "${OCTOPUS_SERVER_URL}"
+  OCTOPUS_API_KEY: "${OCTOPUS_API_KEY}"
+  OCTOPUS_SPACE: "${OCTOPUS_SPACE_NAME}"
+  
+stages:
+  - build
+  - package
+  - deploy-dev
+  - deploy-staging  
+  - deploy-prod
+
+# Build Terraform package
+build-terraform:
+  stage: build
+  script:
+    - echo "Building Terraform package..."
+    - zip -r terraform-package.zip terraform/ -x "*.tfstate*" ".terraform/*"
+  artifacts:
+    paths:
+      - terraform-package.zip
+    expire_in: 1 week
+
+# Package for Octopus
+package-for-octopus:
+  stage: package
+  image: octopusdeploy/octo:latest
+  script:
+    - echo "Packaging for Octopus Deploy..."
+    - octo pack --id="COMPANY_NAME.Infrastructure" --version="${CI_PIPELINE_ID}" --outFolder=packages --include="terraform-package.zip"
+    - octo push --package="packages/COMPANY_NAME.Infrastructure.${CI_PIPELINE_ID}.nupkg" --server="${OCTOPUS_SERVER}" --apiKey="${OCTOPUS_API_KEY}" --space="${OCTOPUS_SPACE}"
+  dependencies:
+    - build-terraform
+
+# Deploy to dev via Octopus
+deploy-dev:
+  stage: deploy-dev
+  image: octopusdeploy/octo:latest
+  script:
+    - echo "Triggering Octopus deployment to dev..."
+    - |
+      octo create-release \
+        --project="COMPANY_NAME-Infrastructure" \
+        --version="${CI_PIPELINE_ID}" \
+        --server="${OCTOPUS_SERVER}" \
+        --apiKey="${OCTOPUS_API_KEY}" \
+        --space="${OCTOPUS_SPACE}" \
+        --deployTo="Development"
+  dependencies:
+    - package-for-octopus
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Deploy to staging (manual)
+deploy-staging:
+  stage: deploy-staging
+  image: octopusdeploy/octo:latest
+  script:
+    - echo "Triggering Octopus deployment to staging..."
+    - |
+      octo create-release \
+        --project="COMPANY_NAME-Infrastructure" \
+        --version="${CI_PIPELINE_ID}" \
+        --server="${OCTOPUS_SERVER}" \
+        --apiKey="${OCTOPUS_API_KEY}" \
+        --space="${OCTOPUS_SPACE}" \
+        --deployTo="Staging"
+  when: manual
+  dependencies:
+    - package-for-octopus
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Deploy to production (manual with approvals)
+deploy-prod:
+  stage: deploy-prod
+  image: octopusdeploy/octo:latest
+  script:
+    - echo "Triggering Octopus deployment to production..."
+    - |
+      octo create-release \
+        --project="COMPANY_NAME-Infrastructure" \
+        --version="${CI_PIPELINE_ID}" \
+        --server="${OCTOPUS_SERVER}" \
+        --apiKey="${OCTOPUS_API_KEY}" \
+        --space="${OCTOPUS_SPACE}" \
+        --deployTo="Production"
+  when: manual
+  dependencies:
+    - package-for-octopus
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'

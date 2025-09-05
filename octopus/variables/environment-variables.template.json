@@ -1,0 +1,46 @@
+{
+  "Variables": [
+    {
+      "Name": "Azure.SubscriptionId",
+      "Value": "#{Azure.Dev.SubscriptionId}",
+      "Scope": {
+        "Environment": ["Development"]
+      }
+    },
+    {
+      "Name": "Azure.SubscriptionId", 
+      "Value": "#{Azure.Staging.SubscriptionId}",
+      "Scope": {
+        "Environment": ["Staging"]
+      }
+    },
+    {
+      "Name": "Azure.SubscriptionId",
+      "Value": "#{Azure.Prod.SubscriptionId}", 
+      "Scope": {
+        "Environment": ["Production"]
+      }
+    },
+    {
+      "Name": "VMSS.Name",
+      "Value": "#{CompanyName}-dev-vmss",
+      "Scope": {
+        "Environment": ["Development"]
+      }
+    },
+    {
+      "Name": "VMSS.BlueGreen.Blue",
+      "Value": "#{CompanyName}-#{Environment}-blue-vmss",
+      "Scope": {
+        "Environment": ["Staging", "Production"]
+      }
+    },
+    {
+      "Name": "VMSS.BlueGreen.Green", 
+      "Value": "#{CompanyName}-#{Environment}-green-vmss",
+      "Scope": {
+        "Environment": ["Staging", "Production"] 
+      }
+    }
+  ]
+}

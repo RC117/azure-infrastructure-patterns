@@ -1,0 +1,37 @@
+{
+  "Name": "COMPANY_NAME-Infrastructure",
+  "Description": "Infrastructure deployment using Terraform",
+  "ProjectGroup": "Infrastructure",
+  "DeploymentProcess": {
+    "Steps": [
+      {
+        "Name": "Plan Infrastructure",
+        "Actions": [
+          {
+            "Name": "Terraform Plan", 
+            "ActionType": "Octopus.Script",
+            "Properties": {
+              "Octopus.Action.Script.ScriptSource": "Package",
+              "Octopus.Action.Script.ScriptFileName": "deploy.ps1",
+              "Octopus.Action.Package.FeedId": "#{PackageFeed}",
+              "Octopus.Action.Package.PackageId": "#{PackageName}"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "Deploy Infrastructure",
+        "Actions": [
+          {
+            "Name": "Terraform Apply",
+            "ActionType": "Octopus.Script",
+            "Properties": {
+              "Octopus.Action.Script.ScriptSource": "Package",
+              "Octopus.Action.Script.ScriptFileName": "apply.ps1"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "Name": "COMPANY_NAME-App-BlueGreen",
+  "Description": "Blue-Green deployment to VMSS",
+  "DeploymentProcess": {
+    "Steps": [
+      {
+        "Name": "Deploy to Green Environment",
+        "Actions": [
+          {
+            "Name": "Update Green VMSS",
+            "ActionType": "Octopus.AzurePowerShell",
+            "Properties": {
+              "Octopus.Action.Azure.SubscriptionId": "#{Azure.SubscriptionId}",
+              "Octopus.Action.Script.ScriptBody": "# TODO: Add your blue-green VMSS update script"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "Health Check Green",
+        "Actions": [
+          {
+            "Name": "Validate Green Environment",
+            "ActionType": "Octopus.Script",
+            "Properties": {
+              "Octopus.Action.Script.ScriptBody": "# Health check validation script"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "Switch Traffic to Green",
+        "Actions": [
+          {
+            "Name": "Update Application Gateway",
+            "ActionType": "Octopus.AzurePowerShell",
+            "Properties": {
+              "Octopus.Action.Script.ScriptBody": "# Traffic switching script"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
