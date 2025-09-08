@@ -75,23 +75,33 @@ cp terraform/environments/dev/terraform.tfvars.example terraform/environments/de
 
 ### Target Blue-Green Architecture
 
-```
-┌─── Production Environment ────┐
-│                               │
-│  ┌── Blue (Live) ──┐          │
-│  │ VMSS-Blue       │          │
-│  │ App Gateway ────┼──┐       │
-│  └─────────────────┘  │       │
-│                       │       │
-│  ┌── Green (Standby) ─┐       │
-│  │ VMSS-Green       │ │       │
-│  │ App Gateway ────┼─┘       │
-│  └─────────────────┘          │
-│                               │
-│  Database (Shared)           │
-│  Storage (Shared)            │
-│  Key Vault (Shared)          │
-└───────────────────────────────┘
+```mermaid
+graph LR
+    subgraph Production
+        AG[Application Gateway]
+
+        subgraph Blue["Blue (Live)"]
+            VMSSB[VMSS - Blue]
+        end
+
+        subgraph Green["Green (Standby)"]
+            VMSSG[VMSS - Green]
+        end
+
+        DB[(PostgreSQL)]
+        SA[(Storage)]
+        KV[(Key Vault)]
+    end
+
+    AG --> VMSSB
+    AG -. standby .-> VMSSG
+
+    VMSSB --- DB
+    VMSSG --- DB
+    VMSSB --- SA
+    VMSSG --- SA
+    KV --- VMSSB
+    KV --- VMSSG
 ```
 
 ### Key Components

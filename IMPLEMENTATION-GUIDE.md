@@ -99,14 +99,33 @@ Explain how to implement immutable infrastructure with my current application de
 
 #### 2. **Blue-Green Deployment Architecture**
 
-```
-Production Environment:
-├── Blue Environment (Live)     ├── Green Environment (Standby)
-│   ├── VMSS-Blue              │   ├── VMSS-Green
-│   └── App Gateway ──┐        │   └── App Gateway ──┐
-└── Database (Shared)  │        └── Database (Shared) │
-                       │                              │
-                       └── Traffic Switch ───────────┘
+```mermaid
+graph LR
+    subgraph Production
+        AG[Application Gateway]
+
+        subgraph Blue["Blue (Live)"]
+            VMSSB[VMSS - Blue]
+        end
+
+        subgraph Green["Green (Standby)"]
+            VMSSG[VMSS - Green]
+        end
+
+        DB[(PostgreSQL)]
+        SA[(Storage)]
+        KV[(Key Vault)]
+    end
+
+    AG --> VMSSB
+    AG -. standby .-> VMSSG
+
+    VMSSB --- DB
+    VMSSG --- DB
+    VMSSB --- SA
+    VMSSG --- SA
+    KV --- VMSSB
+    KV --- VMSSG
 ```
 
 #### 3. **Security-First Design**
