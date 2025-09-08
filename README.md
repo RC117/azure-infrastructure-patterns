@@ -37,7 +37,7 @@ az account set --subscription "YOUR_SUBSCRIPTION_ID"
 ./scripts/setup/discover-current-setup.sh
 
 # Review discovery results
-cat discovery-output/DISCOVERY-SUMMARY.md
+cat discovery-output/SUMMARY.md
 ls discovery-output/
 ```
 

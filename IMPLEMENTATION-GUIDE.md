@@ -59,7 +59,7 @@ az account set --subscription "YOUR_SUBSCRIPTION_ID"
 ./scripts/setup/discover-current-setup.sh
 
 # Review results
-cat discovery-output/DISCOVERY-SUMMARY.md
+cat discovery-output/SUMMARY.md
 ```
 
 #### 3. GitHub Copilot Analysis Session
